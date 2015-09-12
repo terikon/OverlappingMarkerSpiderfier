@@ -17,6 +17,8 @@ class @['OverlappingMarkerSpiderfier']
   ge = gm.event
   mt = gm.MapTypeId
   twoPi = Math.PI * 2
+  spMarkers = [] #evgenyDG
+  nonspMarkers = [] #evgenydDG
   
   p['keepSpiderfied']  = no          # yes -> don't unspiderfy when a marker is selected
   p['markersWontHide'] = no          # yes -> a promise you won't hide markers, so we needn't check
@@ -56,12 +58,18 @@ class @['OverlappingMarkerSpiderfier']
     @initMarkerArrays()
     @listeners = {}
     for e in ['click', 'zoom_changed', 'maptypeid_changed']
-      ge.addListener(@map, e, => @['unspiderfy']())
+      ge.addListener(@map, e, => @['unspiderfy']()) 
+      ge.addListener(@map, e, => @clearSpArrays() ) #evgenyDG
     
   p.initMarkerArrays = ->
     @markers = []
     @markerListenerRefs = []
-    
+
+  p.clearSpArrays = -> #evgenyDG
+    spMarkers = [];
+    nonspMarkers = [];
+  
+
   p['addMarker'] = (marker) ->
     return @ if marker['_oms']?
     marker['_oms'] = yes
@@ -73,6 +81,11 @@ class @['OverlappingMarkerSpiderfier']
     @markerListenerRefs.push(listenerRefs)
     @markers.push(marker)
     @  # return self, for chaining
+
+ 
+  p['keepItSpiderfied']  = ->  #evgenyDG
+   @spiderfy(spMarkers, nonspMarkers)
+
 
   p.markerChangeListener = (marker, positionChanged) ->
     if marker['_omsData']? and (positionChanged or not marker.getVisible()) and not (@spiderfying? or @unspiderfying?)
@@ -206,6 +219,8 @@ class @['OverlappingMarkerSpiderfier']
   
   p.spiderfy = (markerData, nonNearbyMarkers) ->
     @spiderfying = yes
+    spMarkers = markerData.slice() #evgeny
+    nonspMarkers = nonNearbyMarkers.slice() #evgeny
     numFeet = markerData.length
     bodyPt = @ptAverage(md.markerPt for md in markerData)
     footPts = if numFeet >= @['circleSpiralSwitchover'] 
@@ -245,8 +260,10 @@ class @['OverlappingMarkerSpiderfier']
     nonNearbyMarkers = []
     for marker in @markers
       if marker['_omsData']?
-        marker['_omsData'].leg.setMap(null)
-        marker.setPosition(marker['_omsData'].usualPosition) unless marker is markerNotToMove
+        path = marker['_omsData'].leg.getPath() #evgenyDG
+        marker.setPosition(path.j[0]) unless marker is markerNotToMove #evgenyDG
+        marker['_omsData'].leg.setMap(null) 
+        #marker.setPosition(marker['_omsData'].usualPosition) unless marker is markerNotToMove #evgenyDG
         marker.setZIndex(null)
         listeners = marker['_omsData'].hightlightListeners
         if listeners?
