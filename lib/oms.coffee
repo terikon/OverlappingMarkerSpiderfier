@@ -17,8 +17,8 @@ class @['OverlappingMarkerSpiderfier']
   ge = gm.event
   mt = gm.MapTypeId
   twoPi = Math.PI * 2
-  spMarkers = [] #evgenyDG
-  nonspMarkers = [] #evgenydDG
+  spMarkers = [] 
+  nonspMarkers = [] 
   
   p['keepSpiderfied']  = no          # yes -> don't unspiderfy when a marker is selected
   p['markersWontHide'] = no          # yes -> a promise you won't hide markers, so we needn't check
@@ -59,13 +59,13 @@ class @['OverlappingMarkerSpiderfier']
     @listeners = {}
     for e in ['click', 'zoom_changed', 'maptypeid_changed']
       ge.addListener(@map, e, => @['unspiderfy']()) 
-      ge.addListener(@map, e, => @clearSpArrays() ) #evgenyDG
+      ge.addListener(@map, e, => @clearSpArrays() )
     
   p.initMarkerArrays = ->
     @markers = []
     @markerListenerRefs = []
 
-  p.clearSpArrays = -> #evgenyDG
+  p.clearSpArrays = -> 
     spMarkers = [];
     nonspMarkers = [];
   
@@ -83,7 +83,7 @@ class @['OverlappingMarkerSpiderfier']
     @  # return self, for chaining
 
  
-  p['keepItSpiderfied']  = ->  #evgenyDG
+  p['keepItSpiderfied']  = -> 
    @spiderfy(spMarkers, nonspMarkers)
 
 
@@ -260,10 +260,9 @@ class @['OverlappingMarkerSpiderfier']
     nonNearbyMarkers = []
     for marker in @markers
       if marker['_omsData']?
-        path = marker['_omsData'].leg.getPath() #evgenyDG
-        marker.setPosition(path.j[0]) unless marker is markerNotToMove #evgenyDG
+        path = marker['_omsData'].leg.getPath()
+        marker.setPosition(path.j[0]) unless marker is markerNotToMove
         marker['_omsData'].leg.setMap(null) 
-        #marker.setPosition(marker['_omsData'].usualPosition) unless marker is markerNotToMove #evgenyDG
         marker.setZIndex(null)
         listeners = marker['_omsData'].hightlightListeners
         if listeners?
