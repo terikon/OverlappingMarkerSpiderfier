@@ -261,7 +261,7 @@ class @['OverlappingMarkerSpiderfier']
     for marker in @markers
       if marker['_omsData']?
         path = marker['_omsData'].leg.getPath()
-        marker.setPosition(path.j[0]) unless marker is markerNotToMove
+        marker.setPosition(path.getArray()[0]) unless marker is markerNotToMove
         marker['_omsData'].leg.setMap(null) 
         marker.setZIndex(null)
         listeners = marker['_omsData'].hightlightListeners
